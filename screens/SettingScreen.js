@@ -56,7 +56,7 @@ class SettingScreen extends Component {
   render() {
     console.log(this.state);
     return (
-      <ScrollView>
+    <ScrollView>
       <View style={styles.formStyle}>
         <FormLabel>Username</FormLabel>
         <FormInput
@@ -97,7 +97,7 @@ class SettingScreen extends Component {
         </Picker>
         {this.renderButton()}
       </View>
-      </ScrollView>
+    </ScrollView>
     );
   }
 }

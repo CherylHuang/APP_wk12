@@ -21,13 +21,14 @@ class UserScreen extends Component {
   setUserInfo = async () => {
     const { currentUser } = firebase.auth();
     let dbUserid = firebase.database().ref(`/users/${currentUser.uid}`);
+    const { email, phone, username, city, gender } = this.state;
     try {
       let snapshot = await dbUserid.once('value');
       let username = snapshot.val().username || ' ';
-      let email = snapshot.val().email || '';
-      let city = snapshot.val().city || '';
-      let phone = snapshot.val().phone || '';
-      let gender = snapshot.val().gender || 'mail';
+      let email = snapshot.val().email || ' ';
+      let city = snapshot.val().city || ' ';
+      let phone = snapshot.val().phone || ' ';
+      let gender = snapshot.val().gender || ' ';
 
       this.setState({ username, email, city, phone, gender });
     } catch (err) { }

@@ -7,10 +7,10 @@ import { FormLabel, FormInput, Button, CheckBox } from 'react-native-elements';
 // Make a component
 class SettingScreen extends Component {
   state = {
-    email: null,
-    phone: null,
-    username: null,
-    city: null,
+    email: "",
+    phone: "",
+    username: "",
+    city: "",
     gender: 'mail',
     saving: false
   };
@@ -56,14 +56,14 @@ class SettingScreen extends Component {
   render() {
     console.log(this.state);
     return (
-    <ScrollView>
+      <ScrollView>
       <View style={styles.formStyle}>
         <FormLabel>Username</FormLabel>
         <FormInput
           autoCorrect={false}
           placeholder='John Doe'
           value={this.state.username}
-          onChangeText={username => this.setState({ username })}
+          onChangeText={username => {this.setState({ username })} }
         />
         <FormLabel>Email</FormLabel>
         <FormInput
@@ -72,21 +72,21 @@ class SettingScreen extends Component {
           autoCapitalize='none'
           keyboardType='email-address'
           value={this.state.email}
-          onChangeText={email => this.setState({ email })}
+          onChangeText={email => {this.setState({ email })}}
         />
         <FormLabel>Phone</FormLabel>
         <FormInput
           autoCorrect={false}
           placeholder='555-555-5555'
           value={this.state.phone}
-          onChangeText={phone => this.setState({ phone })}
+          onChangeText={phone => {this.setState({ phone }) }}
         />
         <FormLabel>City</FormLabel>
         <FormInput
           autoCorrect={false}
           placeholder='Taipei city'
           value={this.state.city}
-          onChangeText={city => this.setState({ city })}
+          onChangeText={city => {this.setState({ city })}}
         />
         <Picker
           selectedValue={this.state.gender}
@@ -97,7 +97,7 @@ class SettingScreen extends Component {
         </Picker>
         {this.renderButton()}
       </View>
-    </ScrollView>
+      </ScrollView>
     );
   }
 }

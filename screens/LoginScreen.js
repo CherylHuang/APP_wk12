@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, ActivityIndicator, Text, StatusBar, AsyncStorage } from 'react-native';
+import { View, ActivityIndicator, Text, StatusBar, AsyncStorage, Image } from 'react-native';
 import * as firebase from 'firebase';
 import { FormLabel, FormInput, FormValidationMessage, Button } from 'react-native-elements';
 import { Expo } from 'expo';
@@ -73,73 +73,65 @@ class LoginScreen extends Component {
   }
 
 // google login
+// googleLogin = async function signInWithGoogleAsync() {
+//   try {
+//     const result = await Expo.Google.logInAsync({
+//       iosClientId: '863020286473-5bg2lddb9ul0s8v7u3j06j4am5seqdtb.apps.googleusercontent.com',
+//       scopes: ['profile', 'email'],
+//     });
 
-googleLogin = async function signInWithGoogleAsync() {
-  try {
-    const result = await Expo.Google.logInAsync({
+//     if (result.type === 'success') {
+//       return result.accessToken;
+//     } else {
+//       return {cancelled: true};
+//     }
+    
+//   } catch(e) {
+//     return {error: true};
+//   }
+// }
+
+googleLogin = async () => {
+    console.log('Testing token....');
+    let token = await AsyncStorage.getItem('google_token');
+    if (token) {
+      console.log('Already having a token...');
+      this.setState({ token });
+      this.setState({ status: 'Hello!' });
+
+    } else {
+      console.log('DO NOT having a token...');
+      this.doGoogleLogin();
+    }
+  };
+
+doGoogleLogin = async () => {
+    let result = await Expo.Google.logInAsync({
       iosClientId: '863020286473-5bg2lddb9ul0s8v7u3j06j4am5seqdtb.apps.googleusercontent.com',
       scopes: ['profile', 'email'],
     });
     let token = result.accessToken;
-      const credential = firebase.auth.GoogleAuthProvider.credential(token);
+
+    if (result.type === 'cancel') {
+      console.log('Login Fail!!');
+      return;
+    }
+    await AsyncStorage.setItem('google_token', token);
+    this.setState({ token });
+    this.setState({ status: 'Hello!' });
+
+    const credential = firebase.auth.GoogleAuthProvider.credential(token);
+    // Sign in with credential from the Facebook user.
+    try {
       await firebase.auth().signInWithCredential(credential);
       const { currentUser } = await firebase.auth();
       console.log(`currentUser = ${currentUser.uid}`);
       this.props.navigation.navigate('UserStack');
+    } catch (err) {
 
-    if (result.type === 'success') {
-      return result.accessToken;
-    } else {
-      return {cancelled: true};
     }
-    
-  } catch(e) {
-    return {error: true};
-  }
-}
-
-  // googleLogin = async () => {
-  //   console.log('Testing token....');
-  //   let token = await AsyncStorage.getItem('google_token');
-
-  //   if (token) {
-  //     console.log('Already having a token...');
-  //     this.setState({ token });
-  //     this.setState({ status: 'Hello!' });
-
-  //   } else {
-  //     console.log('DO NOT having a token...');
-  //     this.doGoogleLogin();
-  //   }
-  // };
-
-  // doGoogleLogin = async () => {
-  //   const result = await Expo.Google.logInAsync({
-  //     iosClientId: '863020286473-5bg2lddb9ul0s8v7u3j06j4am5seqdtb.apps.googleusercontent.com',
-  //     scopes: ['profile', 'email'],
-  //   });
-
-  //   if (result.type === 'success') {
-  //     return result.accessToken;
-  //   } else {
-  //     return {cancelled: true};
-  //   }
-
-  //   await AsyncStorage.setItem('google_token', token);
-  //   this.setState({ token });
-
-  //   const credential = firebase.auth.GoogleAuthProvider.credential(token);
-
-  //   // Sign in with credential from the Google user.
-  //   try {
-  //     await firebase.auth().signInWithCredential(credential);
-  //     const { currentUser } = await firebase.auth();
-  //     console.log(`currentUser = ${currentUser.uid}`);
-  //     this.props.navigation.navigate('UserStack');
-  //   } catch (err) {
-
-  //   }
-  // };
+  };
+//
 
 
   renderButton() {
@@ -162,12 +154,16 @@ googleLogin = async function signInWithGoogleAsync() {
   }
 
   render() {
-    const { formStyle, bk, text, textNew } = styles;
+    const { formStyle, bk, text, textNew, img } = styles;
     return (
       <View style={bk}>
         <StatusBar hidden={true} />
           <Text style={text}>Medical   </Text>
-          <Text style={text}>   Assistent </Text>
+          <View style={{flexDirection:'row', alignSelf:'center'}}>
+            <Text style={text}>  Assistent </Text>
+            <Image source={{uri:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAD0ElEQVRoQ92a/XHUMBDFdysAKoBUQFIB0AGpgKQCjgqACoAKSCpIqACoAKgA0gFUsMzPWXlknX22bEkZ0H/nkZN9em8/LZX/ZOld4TCzYxF5IiLPReS+iPCb9V1EfovIFxH5pKr8nl3NgZjZUxH5KCKPZq273fBLRN6o6uWh/c2AmBmGAwAgrBs/9WuMDSfvTLGXfbD1MGLqfIqhJkCchSuX0B8R2anqxRJGzOwMRhwQkgMM4AerOhA3BCZYXzllVcWgxcvM8KH3IvLCXwLM4CCqAklAXKoqp7t6mdlORN55MHgWy6wakNIgAnozgwmYwa+OwvMqQGqBiMAQkh+LyFtVxX+kOJDaIDDag8dnl9gRPlcUSAsQI6ycEsWKAWkJwlkJjt8FkSJAWoNwICTNn8HpNwO5CxCRvKxzdNbqoH7rdOSFkOw254lcW8xsO5AEBDYQEklSWVk71/h4/2YgKRNeghPXm4LZBGRMTl4L0T80A+NV8jcR+aGqx1k+MsIEhuNsJ63BmBkZ/bWIfFDV3WIgE0x03Rsn4iGRKrUJM2YGG/zf5QkxJzq1YCay50ZVu05zlpFDckoiCCdUXWZ+UPwvAPR9yUEgS+SU1D7VZWZm5C3yV+fks2V8jpymckFpmUUOTrt8rKoMJro1yoiHNspknJfpRR+dpuRUW2bJwZJ4CSr92gOSgqCyNLNBdJqSUy2ZJSD2+vU9RhJHKlo7rZXZEhBjQJAT8ySmHfdCFMqVUymZLQUxABK1jzgSoa3TYBwZPOk1kVkOiBRIYGNUg1ORac3zOZnlguiBRAUYz65V9bSUnHJltgZEDCT0vzwbJJoScsqIZsysmCiyspTRhV8zwx8Y8e/F5zXSyXknkVl4NQtEzEioJB+EDs+ry652aiCzUHZkMxFsC4z0ve+UDGo9FxEOMcyEs5mYBZIjj7V7owJwNRMpEIovPqiEHPFPyCk+wNTZSYZMufvyuEbUKiWnMSCEvJfxdHutXObeKymnMSDUV2T2/ptDjahVC0Qffl0+wU+6Zn5r6Z5GuRpy2mPEgYTxJ4BOSk4MazIxiFrJ6dENXqjqefS8HyzkJscWIAbSclaIVpQr9CI9mLUyqy2nUWlFpx8cn0cUca9yZeb1E2UHH/w3J7u5SLjHSAKGj/IwM7hCMRPN2Mt7hHMGF+QlvqsPBgVLDMvdMznX8isXMEJVzApGhplSdxXDTx+/So2lXT6LRza5xuXsXzppDFcolvxt7pgAoDoLB31kylLvItE8TCCbbtZFIxZdS6K7XHQtacmJ5OyZZSTnj93l3r8GDxBgLOxf6wAAAABJRU5ErkJggg=='}}
+                  style={img} />
+          </View>
 
         <View style={formStyle}>
           <FormLabel labelStyle = {{fontSize:15, color:'white'}}>Email</FormLabel>
@@ -233,7 +229,7 @@ const styles = {
     fontFamily:'Zapfino',
     fontSize:30,
     alignSelf:"center",
-    marginBottom:-40
+    marginBottom:-45
   },
   textNew:{
     color:'white',
@@ -241,6 +237,11 @@ const styles = {
     alignSelf:"center",
     fontSize:15,
     marginTop:10
+  },
+  img:{
+    width:25,
+    height:25,
+    marginTop:35
   }
 };
 

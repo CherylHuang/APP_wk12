@@ -26,7 +26,7 @@ class NewUserScreen extends Component {
       
       const { currentUser } = firebase.auth();
       let dbUserid = firebase.database().ref(`/users/${currentUser.uid}`);
-      await dbUserid.set({ email, phone, username, city, gender });
+      await dbUserid.set({ email:email || " ", phone:phone || " ", username:username || " ", city:city || " ", gender:gender || " " });
 
       this.props.navigation.navigate('UserStack');
       this.setState({ saving: false });

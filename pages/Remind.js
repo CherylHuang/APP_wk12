@@ -7,7 +7,10 @@ import clock from '../json/clock.json';
 
 // Make a component
 class Reminder extends Component {
-  state = { clock: [] };
+  state = { 
+      clock: [],
+      value: '鬧鐘'
+   };
 
   componentWillMount() {
     this.setState({ clock });
@@ -17,7 +20,7 @@ class Reminder extends Component {
     this.props.navigation.navigate('ClockDetails', { ...ck });
   };
 
-//checkbox
+// checkbox
 constructor(props) {
     super(props);
     this.state = {
@@ -25,25 +28,32 @@ constructor(props) {
     };
   }
 handlePressCheckedBox = (checked) => {
-    this.setState({
-      isChecked: checked,
-    });
+     this.setState({
+       isChecked: checked,
+     });
 }
 
 
-  render() {
+//SegmentedControlIOS
+_onValueChange = (value) => {
+    this.setState({
+      value: value,
+    });
+  };
+
+renderListView = (val) => {
      const { checkbox, directionRow, clockContain, clockbox,
      alignItemCenter, list, AM_PM_text, time, directionCol, medi, week,
      chevron, info } = styles;
 
-    return (
-    <View>
-        <View style={{backgroundColor:"white"}}>
-          <SegmentedControlIOS values={['鬧鐘', '時刻表']} 
-          selectedIndex={0} marginTop={5} marginBottom={5}
-          marginLeft={30} marginRight={30} tintColor="#517fa4"
-          />
-        </View>
+    if (val === '時刻表') {
+      return (
+        <ScrollView>
+        <Text>HI</Text>
+        </ScrollView>
+        )
+    } else if (val  === '鬧鐘') {
+      return (
       <ScrollView>
         <List containerStyle={{marginTop: 0,paddingBottom: 40}}>
           {this.state.clock.map((ck) => (
@@ -81,6 +91,23 @@ handlePressCheckedBox = (checked) => {
           ))}
         </List>
      </ScrollView>
+        )
+    }
+  };
+
+
+  render() {
+    return (
+    <View>
+        <View style={{backgroundColor:"white"}}>
+          <SegmentedControlIOS values={['鬧鐘','時刻表']} value={'鬧鐘'}
+            onValueChange={this._onValueChange}
+            selectedIndex={0} tintColor="#517fa4"
+            marginTop={5} marginBottom={5}
+            marginLeft={30} marginRight={30}
+          />
+        </View>
+            {this.renderListView(this.state.value)}
     </View>
     );
   }
@@ -103,8 +130,8 @@ const styles = {
     borderColor:'#eeeeee',
   },
     checkbox: {
-        width: 50,
-        marginLeft: 10
+        width: 55,
+        marginLeft: 15
     },
   clockContain:{
     marginLeft:5,
@@ -122,7 +149,7 @@ const styles = {
     borderRadius:5
   },
   info:{
-    flex:1.5
+    flex:1.4
   },
   AM_PM_text:{
     marginRight:5,

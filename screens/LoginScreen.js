@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { View, ActivityIndicator, Text, StatusBar, AsyncStorage, Image } from 'react-native';
+import { View, ActivityIndicator, AsyncStorage, Image, Text, StatusBar } from 'react-native';
 import * as firebase from 'firebase';
 import { FormLabel, FormInput, FormValidationMessage, Button } from 'react-native-elements';
-import { Expo } from 'expo';
+import { Expo, Facebook } from 'expo';
 
 import Confirm from '../components/Confirm';
 
@@ -91,36 +91,89 @@ class LoginScreen extends Component {
 //   }
 // }
 
-googleLogin = async () => {
+// googleLogin = async () => {
+//     console.log('Testing token....');
+//     let token = await AsyncStorage.getItem('google_token');
+//     if (token) {
+//       console.log('Already having a token...');
+//       this.setState({ token });
+//       this.setState({ status: 'Hello!' });
+
+//     } else {
+//       console.log('DO NOT having a token...');
+//       this.doGoogleLogin();
+//     }
+//   };
+
+// doGoogleLogin = async () => {
+//     let result = await Expo.Google.logInAsync({
+//       iosClientId: '863020286473-5bg2lddb9ul0s8v7u3j06j4am5seqdtb.apps.googleusercontent.com',
+//       scopes: ['profile', 'email'],
+//     });
+//     let token = result.accessToken;
+
+//     if (result.type === 'cancel') {
+//       console.log('Login Fail!!');
+//       return;
+//     }
+//     await AsyncStorage.setItem('google_token', token);
+//     this.setState({ token });
+//     this.setState({ status: 'Hello!' });
+
+//     const credential = firebase.auth.GoogleAuthProvider.credential(token);
+//     // Sign in with credential from the Facebook user.
+//     try {
+//       await firebase.auth().signInWithCredential(credential);
+//       const { currentUser } = await firebase.auth();
+//       console.log(`currentUser = ${currentUser.uid}`);
+//       this.props.navigation.navigate('UserStack');
+//     } catch (err) {
+
+//     }
+//   };
+//
+
+//FB login
+facebookLogin = async () => {
     console.log('Testing token....');
-    let token = await AsyncStorage.getItem('google_token');
+    let token = await AsyncStorage.getItem('fb_token');
+
     if (token) {
       console.log('Already having a token...');
       this.setState({ token });
-      this.setState({ status: 'Hello!' });
+
+      const response = await fetch(
+        `https://graph.facebook.com/me?access_token=${token}`);
+      this.setState({ status: `Hello ${(await response.json()).name}` });
+      console.log(response);
 
     } else {
       console.log('DO NOT having a token...');
-      this.doGoogleLogin();
+      this.doFacebookLogin();
     }
   };
 
-doGoogleLogin = async () => {
-    let result = await Expo.Google.logInAsync({
-      iosClientId: '863020286473-5bg2lddb9ul0s8v7u3j06j4am5seqdtb.apps.googleusercontent.com',
-      scopes: ['profile', 'email'],
-    });
-    let token = result.accessToken;
+  doFacebookLogin = async () => {
+    let { type, token } = await Facebook.logInWithReadPermissionsAsync(
+      '291530571274093',
+      {
+        permissions: ['public_profile'],
+        behavior: 'web'
+      });
 
-    if (result.type === 'cancel') {
+    if (type === 'cancel') {
       console.log('Login Fail!!');
       return;
     }
-    await AsyncStorage.setItem('google_token', token);
-    this.setState({ token });
-    this.setState({ status: 'Hello!' });
 
-    const credential = firebase.auth.GoogleAuthProvider.credential(token);
+    await AsyncStorage.setItem('fb_token', token);
+    this.setState({ token });
+    const response = await fetch(
+      `https://graph.facebook.com/me?access_token=${token}`);
+    this.setState({ status: `Hello ${(await response.json()).name}` });
+    console.log(response);
+    const credential = firebase.auth.FacebookAuthProvider.credential(token);
+
     // Sign in with credential from the Facebook user.
     try {
       await firebase.auth().signInWithCredential(credential);
@@ -131,7 +184,7 @@ doGoogleLogin = async () => {
 
     }
   };
-//
+  //
 
 
   renderButton() {
@@ -190,12 +243,18 @@ doGoogleLogin = async () => {
           <FormValidationMessage>{this.state.error}</FormValidationMessage>
         </View>
         <View>
-            <Button
+            {/*<Button
               title='Sign in with Google+'
               backgroundColor='#dc4e42'
               icon={{type:'evilicon', name:'sc-google-plus', size:40}}
               onPress={this.googleLogin}
-            />
+            />*/}
+            <Button
+            title='Sign in with Facebook'
+            backgroundColor='#39579A'
+            icon={{type:'evilicon', name:'sc-facebook', size:40}}
+            onPress={this.facebookLogin}
+             />
         </View>
         <View style={formStyle}>
            <Text

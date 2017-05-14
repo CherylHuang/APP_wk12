@@ -13,6 +13,7 @@ import Remind from './pages/Remind';
 import MedicineDetails from './pages/MedicineDetails';
 import ClockDetails from './pages/ClockDetails';
 import EditClock from './pages/EditClock';
+import EditPassword from  './pages/EditPassword';
 
 import DeleteAddIcon from './components/delete_add';
 import DeleteCalIcon from './components/delete_cal';
@@ -153,7 +154,7 @@ export const RemindStack = StackNavigator({
           />
         ),*/
       })
-    }
+    },
   },
 },
 {
@@ -201,16 +202,18 @@ export const SettingStack = StackNavigator({
       header: ({state}) => ({
         title:'我的帳戶',
         tintColor:"#517fa4",
-       right:(
-          <Button
-          title='編輯'
-          color = "#517fa4"
-          /*onPress={() => navigate('')}*/
-          />
-        ),
       })
     },
   },
+  EditPassword: {
+    screen: EditPassword,
+    navigationOptions: {
+      header: () => ({
+        title: '密碼設定',
+        tintColor:"#517fa4",
+      })
+    },
+  }, 
 },
 {
   // headerMode: 'none',

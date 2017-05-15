@@ -202,8 +202,12 @@ facebookLogin = async () => {
     );
   }
 
-  async componentDidMount() {
-    await AsyncStorage.removeItem('google_token');
+  // async componentDidMount() {
+  //   await AsyncStorage.removeItem('google_token');
+  // }
+
+    async componentDidMount() {
+    await AsyncStorage.removeItem('fb_token');
   }
 
   render() {
